@@ -1,0 +1,757 @@
+
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DUUNARI!</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            color: black;
+            background-color: #ddd;
+            background-image: url("duunari.png");
+            background-size: 100% auto;
+            background-position: center top;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+        }
+
+        button {
+            font-size: 24px;
+            padding: 20px 30px;
+            width: 300px;
+            max-width: 100%;
+            cursor: pointer;
+            color: black;
+            background: rgba(255, 255, 255, 0.94);
+            border: 3px solid black;
+        }
+
+        button:hover {
+            background: #ddd;
+        }
+
+        button:focus-visible {
+            outline: 4px solid #1676d2;
+            outline-offset: 3px;
+        }
+
+        .menu {
+            position: absolute;
+            right: 6%;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel {
+            display: none;
+            position: fixed;
+            z-index: 5;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 3px solid black;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.97);
+            text-align: center;
+            width: 500px;
+            max-width: 92%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .panel h2 {
+            font-size: 36px;
+        }
+
+        .panel p {
+            font-size: 22px;
+        }
+
+        .close {
+            width: 50px;
+            height: 50px;
+            padding: 0;
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            font-size: 30px;
+        }
+
+        #volume {
+            width: 100%;
+            height: 35px;
+        }
+
+        #showerMessage {
+            font-size: 24px;
+            font-weight: bold;
+            min-height: 30px;
+        }
+
+        #story {
+            display: none;
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            background-size: cover;
+            background-position: 35% center;
+            background-repeat: no-repeat;
+            background-color: #bbb;
+        }
+
+        .story-box {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: min(540px, calc(100% - 40px));
+            padding: 25px;
+            border: 3px solid black;
+            background: rgba(255, 255, 255, 0.94);
+            text-align: left;
+        }
+
+        .story-box h1 {
+            font-size: 36px;
+            margin: 0 0 15px;
+        }
+
+        #narration {
+            font-size: 23px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .story-box button {
+            width: 100%;
+        }
+
+        #game,
+        #ending {
+            display: none;
+            position: fixed;
+            inset: 0;
+            overflow-y: auto;
+            background: rgba(230, 230, 230, 0.91);
+            padding: 25px;
+            text-align: center;
+        }
+
+        .game-box {
+            max-width: 760px;
+            margin: 0 auto;
+            padding: 25px;
+            border: 4px solid black;
+            background: rgba(255, 255, 255, 0.97);
+        }
+
+        .game-box h1 {
+            font-size: 44px;
+            margin-top: 0;
+        }
+
+        .description {
+            font-size: 21px;
+            line-height: 1.5;
+        }
+
+        .meter {
+            height: 27px;
+            border: 2px solid black;
+            margin: 10px 0 20px;
+            background: #eee;
+        }
+
+        .bar {
+            height: 100%;
+            width: 0%;
+            transition: width 0.2s;
+        }
+
+        #reputationBar {
+            background: #62b96d;
+        }
+
+        #confidenceBar {
+            background: #68a9e8;
+        }
+
+        #progressBar {
+            background: #e8bd4e;
+        }
+
+        .game-box button {
+            display: block;
+            width: 100%;
+            margin: 10px 0;
+            font-size: 20px;
+        }
+
+        #questionTitle {
+            font-size: 28px;
+        }
+
+        #feedback {
+            font-weight: bold;
+            font-size: 20px;
+            min-height: 30px;
+        }
+
+        .ending-box {
+            max-width: 800px;
+            margin: 5vh auto;
+            border: 4px solid black;
+            padding: 35px;
+            background: rgba(255, 255, 255, 0.97);
+        }
+
+        @media (max-width: 700px) {
+            .menu {
+                left: 20px;
+                right: 20px;
+                top: 50%;
+                transform: translateY(-50%);
+                gap: 12px;
+            }
+
+            .menu button {
+                width: 100%;
+                padding: 15px;
+                font-size: 21px;
+            }
+
+            .panel {
+                padding: 30px 20px;
+            }
+
+            .story-box {
+                top: 12px;
+                left: 12px;
+                width: calc(100% - 24px);
+                padding: 18px;
+            }
+
+            .story-box h1 {
+                font-size: 28px;
+            }
+
+            #narration {
+                font-size: 20px;
+            }
+
+            #game,
+            #ending {
+                padding: 12px;
+            }
+
+            .game-box {
+                padding: 15px;
+            }
+
+            .ending-box {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="menu" id="mainMenu">
+        <button onclick="startStory()">Aloita Peli</button>
+        <button onclick="openPanel('settings')">Asetukset</button>
+        <button onclick="openPanel('credits')">Credits</button>
+        <button onclick="exitGame()">Poistu Pelistä</button>
+    </div>
+
+    <div class="panel" id="credits">
+        <button class="close" onclick="closePanels()">×</button>
+        <h2>Credits</h2>
+        <p>Tekijät:</p>
+        <p>Toivo</p>
+        <p>Duunari!</p>
+    </div>
+
+    <div class="panel" id="settings">
+        <button class="close" onclick="closePanels()">×</button>
+        <h2>Asetukset</h2>
+        <p>Äänenvoimakkuus</p>
+        <p>Tässä pelissä ei ole ääniä edes xD.</p>
+
+        <input
+            type="range"
+            id="volume"
+            min="0"
+            max="100"
+            value="50"
+            oninput="document.getElementById('volumeValue').textContent = this.value + '%'"
+        >
+
+        <p id="volumeValue">50%</p>
+
+        <button onclick="takeShower()">Suihku</button>
+        <p id="showerMessage" aria-live="polite"></p>
+    </div>
+
+    <div id="story">
+        <div class="story-box">
+            <h1 id="sceneTitle"></h1>
+            <p id="narration"></p>
+            <button onclick="exitStory()">Päävalikko</button>
+        </div>
+    </div>
+
+    <div id="game">
+        <div class="game-box">
+            <h1>UGA BUGA SHOP</h1>
+
+            <p id="gameText" class="description">
+                Tervetuloa työhaastatteluun!
+            </p>
+
+            <h2 id="questionTitle">Haastattelijan kysymys</h2>
+            <p id="question" class="description"></p>
+
+            <div id="answers"></div>
+
+            <p id="feedback" aria-live="polite"></p>
+
+            <h2>Maine</h2>
+            <p id="reputationValue">0 / 100</p>
+            <div class="meter">
+                <div class="bar" id="reputationBar"></div>
+            </div>
+
+            <h2>Itsevarmuus</h2>
+            <p id="confidenceValue">50 / 100</p>
+            <div class="meter">
+                <div class="bar" id="confidenceBar"></div>
+            </div>
+
+            <h2>Haastattelun eteneminen</h2>
+            <p id="progressValue">0 / 5</p>
+            <div class="meter">
+                <div class="bar" id="progressBar"></div>
+            </div>
+
+            <button id="nextButton" onclick="nextQuestion()" hidden>
+                Seuraava kysymys
+            </button>
+
+            <button onclick="exitStory()">Päävalikko</button>
+        </div>
+    </div>
+
+    <div id="ending">
+        <div class="ending-box">
+            <h1 id="endingTitle"></h1>
+            <p id="endingText" class="description"></p>
+            <p id="endingStats" class="description"></p>
+
+            <button onclick="restartGame()">Pelaa uudelleen</button>
+            <br><br>
+            <button onclick="exitStory()">Päävalikko</button>
+        </div>
+    </div>
+
+    <script>
+        const scenes = [
+            {
+                title: "Työtön maanantai",
+                text: "Heräät aamulla ja huomaat, että tililläsi on vittu vain 12 euroa. Tarvitset työpaikan, senkin työtön paskiainen!",
+                image: "duunari1.png"
+            },
+            {
+                title: "Työpaikkailmoitus",
+                text: "Selaat puhelintasi ja löydät ilmoituksen. Uga buga shop etsii perkele uutta työntekijää. Päätät hakea paikkaa :OOO!",
+                image: "duunari2.png"
+            },
+            {
+                title: "Työhaastattelu",
+                text: "Saavut Uga buga shopin toimistoon. Työnantaja katsoo sinua toivottomasti ja sanoo: Tervetuloa haastatteluun!",
+                image: "duunari3.png"
+            }
+        ];
+
+        const questions = [
+            {
+                question: "1. Kerro vähän itsestäsi.",
+                answers: [
+                    {
+                        text: "Olen ahkera, opin nopeasti ja tulen toimeen ihmisten kanssa.",
+                        reputation: 20,
+                        confidence: 10,
+                        feedback: "Työnantaja vaikuttaa tyytyväiseltä vastaukseesi."
+                    },
+                    {
+                        text: "En oikein tiedä, miksi olen edes täällä.",
+                        reputation: 0,
+                        confidence: -10,
+                        feedback: "Työnantaja jää miettimään motivaatiotasi."
+                    },
+                    {
+                        text: "En halua kertoa itsestäni mitään. Haluaisin vain himaan takas vetelee händuu.",
+                        reputation: -10,
+                        confidence: -5,
+                        feedback: "Työnantaja ei saa sinusta hyvää kuvaa."
+                    }
+                ]
+            },
+            {
+                question: "2. Miksi haluat töihin Uga buga shopiin?",
+                answers: [
+                    {
+                        text: "Haluan oppia uutta ja tehdä työni hyvin.",
+                        reputation: 20,
+                        confidence: 10,
+                        feedback: "Työnantaja arvostaa motivaatiotasi."
+                    },
+                    {
+                        text: "Tarvitsen rahaa ja haluan tehdä töitä.",
+                        reputation: 10,
+                        confidence: 5,
+                        feedback: "Rehellinen vastaus. Työnantaja nyökkää."
+                    },
+                    {
+                        text: "En tiedä. Tämä oli ensimmäinen ilmoitus, jonka näin ja tarvitsen vitun äkkiä rahaa, muuten valtio vie katon pään päältä.",
+                        reputation: 0,
+                        confidence: -5,
+                        feedback: "Olisit voinut tutustua kauppaan etukäteen. Ja työttömyytesi ei ole meidän ongelma, senkin työtön paska."
+                    }
+                ]
+            },
+            {
+                question: "3. Mitä teet, jos asiakas on vihainen?",
+                answers: [
+                    {
+                        text: "Kuuntelen rauhassa ja yritän auttaa asiakasta.",
+                        reputation: 20,
+                        confidence: 10,
+                        feedback: "Erinomaista! Asiakaspalvelutaito on tärkeää."
+                    },
+                    {
+                        text: "Sanon asiakkaalle, että haista vittu ja että hän voi lähteä pois.",
+                        reputation: -10,
+                        confidence: 0,
+                        feedback: "Työnantaja ei pidä tavastasi ratkaista ongelmaa."
+                    },
+                    {
+                        text: "Yritän selvittää tilanteen asiallisesti.",
+                        reputation: 15,
+                        confidence: 5,
+                        feedback: "Hyvä! Rauhallisuus auttaa vaikeissakin tilanteissa."
+                    }
+                ]
+            },
+            {
+                question: "4. Mitä teet, jos et osaa työtehtävää?",
+                answers: [
+                    {
+                        text: "Kysyn neuvoa ja opettelen tekemään tehtävän oikein.",
+                        reputation: 20,
+                        confidence: 10,
+                        feedback: "Työnantaja arvostaa haluasi oppia."
+                    },
+                    {
+                        text: "Ootan että joku osaavaisempi tulee ja sillä aikaa low key katselen John Porkin moggaus Tiktokkeja.",
+                        reputation: -10,
+                        confidence: -5,
+                        feedback: "Työtehtävät pitää tehdä turvallisesti ja oikein."
+                    },
+                    {
+                        text: "Pyydän apua vastaavalta työntekijältä.",
+                        reputation: 15,
+                        confidence: 5,
+                        feedback: "Hyvä ratkaisu!"
+                    }
+                ]
+            },
+            {
+                question: "5. Miksi meidän pitäisi palkata juuri sinut?",
+                answers: [
+                    {
+                        text: "Olen valmis oppimaan ja kantamaan vastuuni.",
+                        reputation: 20,
+                        confidence: 10,
+                        feedback: "Vahva lopetus haastattelulle!"
+                    },
+                    {
+                        text: "Olen parempi kuin kaikki muut hakijat.",
+                        reputation: 5,
+                        confidence: 5,
+                        feedback: "Itsevarmuus on hyvä asia, mutta perustelut puuttuvat."
+                    },
+                    {
+                        text: "En tiedä, päättäkää itse perkele",
+                        reputation: 0,
+                        confidence: -10,
+                        feedback: "Olisit voinut kertoa vahvuuksistasi."
+                    }
+                ]
+            }
+        ];
+
+        let currentScene = 0;
+        let currentQuestion = 0;
+        let reputation = 0;
+        let confidence = 50;
+        let storyTimer = null;
+        let storyRunId = 0;
+        let answered = false;
+
+        function openPanel(id) {
+            closePanels();
+            document.getElementById(id).style.display = "block";
+        }
+
+        function closePanels() {
+            document.getElementById("credits").style.display = "none";
+            document.getElementById("settings").style.display = "none";
+        }
+
+        function takeShower() {
+            document.getElementById("showerMessage").textContent =
+                "Menit suihkuun";
+        }
+
+        function hideScreens() {
+            document.getElementById("mainMenu").style.display = "none";
+            document.getElementById("story").style.display = "none";
+            document.getElementById("game").style.display = "none";
+            document.getElementById("ending").style.display = "none";
+        }
+
+        function startStory() {
+            closePanels();
+            clearTimeout(storyTimer);
+
+            const runId = ++storyRunId;
+
+            hideScreens();
+            currentScene = 0;
+
+            document.getElementById("story").style.display = "block";
+
+            showScene(runId);
+        }
+
+        function showScene(runId) {
+            if (runId !== storyRunId) return;
+
+            clearTimeout(storyTimer);
+
+            const scene = scenes[currentScene];
+
+            document.getElementById("story").style.backgroundImage =
+                'url("' + scene.image + '")';
+
+            document.getElementById("sceneTitle").textContent =
+                scene.title;
+
+            document.getElementById("narration").textContent =
+                scene.text;
+
+            storyTimer = setTimeout(function() {
+                if (runId !== storyRunId) return;
+
+                if (currentScene < scenes.length - 1) {
+                    currentScene++;
+                    showScene(runId);
+                } else {
+                    startInterview();
+                }
+            }, 5000);
+        }
+
+        function startInterview() {
+            clearTimeout(storyTimer);
+            ++storyRunId;
+
+            hideScreens();
+
+            currentQuestion = 0;
+            reputation = 0;
+            confidence = 50;
+            answered = false;
+
+            document.getElementById("game").style.display = "block";
+
+            document.getElementById("gameText").textContent =
+                "Uga buga shopin pomo: Tervetuloa haastatteluun! Katsotaan, sopisitko meille töihin.";
+
+            updateMeters();
+            showQuestion();
+        }
+
+        function showQuestion() {
+            answered = false;
+
+            const q = questions[currentQuestion];
+
+            document.getElementById("questionTitle").textContent =
+                "Uga buga shop - työhaastattelu";
+
+            document.getElementById("question").textContent =
+                q.question;
+
+            document.getElementById("feedback").textContent = "";
+
+            const answersBox = document.getElementById("answers");
+            answersBox.replaceChildren();
+
+            q.answers.forEach(function(answer, index) {
+                const button = document.createElement("button");
+
+                button.textContent = answer.text;
+                button.onclick = function() {
+                    chooseAnswer(index);
+                };
+
+                answersBox.appendChild(button);
+            });
+
+            document.getElementById("nextButton").hidden = true;
+
+            document.getElementById("progressValue").textContent =
+                currentQuestion + " / " + questions.length;
+
+            document.getElementById("gameText").textContent =
+                "Uga buga shopin pomo odottaa vastaustasi.";
+        }
+
+        function chooseAnswer(index) {
+            if (answered) return;
+
+            answered = true;
+
+            const answer = questions[currentQuestion].answers[index];
+
+            reputation = Math.max(
+                0,
+                Math.min(100, reputation + answer.reputation)
+            );
+
+            confidence = Math.max(
+                0,
+                Math.min(100, confidence + answer.confidence)
+            );
+
+            updateMeters();
+
+            document.getElementById("feedback").textContent =
+                answer.feedback;
+
+            document.getElementById("gameText").textContent =
+                "Uga buga shopin pomo kirjoittaa muistiinpanoja.";
+
+            document.getElementById("answers").replaceChildren();
+
+            const nextButton = document.getElementById("nextButton");
+
+            nextButton.hidden = false;
+
+            nextButton.textContent =
+                currentQuestion === questions.length - 1
+                    ? "Katso lopputulos"
+                    : "Seuraava kysymys";
+        }
+
+        function nextQuestion() {
+            if (!answered) return;
+
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                showQuestion();
+            } else {
+                finishInterview();
+            }
+        }
+
+        function updateMeters() {
+            document.getElementById("reputationValue").textContent =
+                reputation + " / 100";
+
+            document.getElementById("confidenceValue").textContent =
+                confidence + " / 100";
+
+            document.getElementById("reputationBar").style.width =
+                reputation + "%";
+
+            document.getElementById("confidenceBar").style.width =
+                confidence + "%";
+
+            document.getElementById("progressBar").style.width =
+                (currentQuestion / questions.length * 100) + "%";
+        }
+
+        function finishInterview() {
+            hideScreens();
+
+            document.getElementById("ending").style.display = "block";
+            document.getElementById("progressBar").style.width = "100%";
+
+            const endingTitle = document.getElementById("endingTitle");
+            const endingText = document.getElementById("endingText");
+
+            if (reputation >= 70) {
+                endingTitle.textContent = "SAIT TYÖPAIKAN!";
+
+                endingText.textContent =
+                    "Uga buga shopin pomo nousee kättelemään sinua. " +
+                    '"Vaikutat juuri sopivalta työntekijältä. ' +
+                    'Tervetuloa Uga buga shopiin töihin, et ole enään työtön!"';
+            } else if (reputation >= 40) {
+                endingTitle.textContent = "JÄIT VARASIJALLE";
+
+                endingText.textContent =
+                    "Uga buga shopin haastattelu meni kohtalaisesti. " +
+                    "Pomo kertoo ottavansa yhteyttä myöhemmin. " +
+                    "Työpaikka ei ole vielä varma.";
+            } else {
+                endingTitle.textContent = "ET SAANUT TYÖPAIKKAA PERKELE, SENKIN PASKIAIANEN";
+
+                endingText.textContent =
+                    "Uga buga shop valitsi toisen hakijan. " +
+                    "Voit yrittää uudelleen ja valita seuraavalla " +
+                    "kerralla toisin.";
+            }
+
+            document.getElementById("endingStats").textContent =
+                "Maine: " + reputation + "/100 | " +
+                "Itsevarmuus: " + confidence + "/100";
+        }
+
+        function restartGame() {
+            startStory();
+        }
+
+        function exitStory() {
+            ++storyRunId;
+            clearTimeout(storyTimer);
+
+            hideScreens();
+            closePanels();
+
+            document.getElementById("mainMenu").style.display = "flex";
+        }
+
+        function exitGame() {
+            window.close();
+            exitStory();
+        }
+    </script>
+
+</body>
+</html>
